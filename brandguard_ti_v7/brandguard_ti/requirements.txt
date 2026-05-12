@@ -1,0 +1,16 @@
+fastapi>=0.115
+uvicorn[standard]>=0.30
+python-multipart>=0.0.9
+playwright>=1.44
+beautifulsoup4>=4.12
+lxml>=5.2
+requests>=2.31
+Pillow>=10.0
+ipwhois>=1.3.0
+python-whois>=0.9.5
+dnspython>=2.6.1
+jinja2>=3.1.4
+imagehash>=4.3.1
+opencv-python-headless>=4.10.0.84
+aiofiles>=24.1.0
+numpy>=1.26

