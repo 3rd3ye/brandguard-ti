@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BrandGuard</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div class="bg-orb orb-a"></div>
+  <div class="bg-orb orb-b"></div>
+  <div class="bg-orb orb-c"></div>
+
+  <main class="page">
+    <header class="hero card">
+      <div>
+        <div class="eyebrow">Threat intelligence • phishing • trademark abuse</div>
+        <h1>BrandGuard</h1>
+        <p class="hero-byline"><em>built by Arnab</em></p>
+        <p class="lede">
+          Paste a URL and see whether it behaves like a fake customer page, a phishing login page, or a brand impersonation attempt.
+          The dashboard adds free public threat-intel context and infrastructure evidence in one place.
+        </p>
+        <div class="chips">
+          <span>URL analysis</span>
+          <span>Trademark signals</span>
+          <span>Actionable insights</span>
+          <span>Hosting / ASN</span>
+          <span>Screenshot evidence</span>
+        </div>
+      </div>
+      <div class="hero-panel">
+        <div class="hero-metric">
+          <label>Mode</label>
+          <strong>Passive inspection only</strong>
+        </div>
+        <div class="hero-metric">
+          <label>Intel layer</label>
+          <strong>URLhaus • CT • RDAP</strong>
+        </div>
+        <div class="hero-metric">
+          <label>Output</label>
+          <strong>Risk score, evidence, next steps</strong>
+        </div>
+      </div>
+    </header>
+
+    <section class="card form-card">
+      <div class="section-head">
+        <h2>Analyze a webpage</h2>
+        <p>Enter the suspicious URL and optional customer details. The analysis result stays on screen until you run a new check.</p>
+      </div>
+
+      <form id="analyzeForm" class="grid-form">
+        <div class="field full">
+          <label for="url">Webpage URL</label>
+          <input id="url" name="url" type="url" placeholder="https://example.com/login" required />
+        </div>
+
+        <div class="field">
+          <label for="brand_name">Customer / brand name</label>
+          <input id="brand_name" name="brand_name" type="text" placeholder="VFS Global" />
+        </div>
+
+        <div class="field">
+          <label for="official_domain">Official domain</label>
+          <input id="official_domain" name="official_domain" type="text" placeholder="vfsglobal.com" />
+        </div>
+
+        <div class="field">
+          <label for="logo_files">Official logo reference (optional)</label>
+          <input id="logo_files" name="logo_files" type="file" accept="image/png,image/jpeg,image/webp" multiple />
+        </div>
+
+        <div class="field small">
+          <label for="timeout_ms">Timeout (ms)</label>
+          <input id="timeout_ms" name="timeout_ms" type="number" min="5000" max="12000" step="500" value="9000" />
+        </div>
+
+        <div class="field small">
+          <label for="max_images">Images to inspect</label>
+          <input id="max_images" name="max_images" type="number" min="1" max="10" value="5" />
+        </div>
+
+        <div class="actions full">
+          <button type="submit" class="primary">Analyze URL</button>
+          <button type="button" class="secondary" data-sample="/sample/benign">Load benign sample</button>
+          <button type="button" class="secondary" data-sample="/sample/phish">Load phishing sample</button>
+        </div>
+      </form>
+
+      <div class="job-panel" id="jobPanel" aria-live="polite">
+        <div class="job-head">
+          <div>
+            <span class="job-label">Analysis status</span>
+            <strong id="statusText">Idle</strong>
+          </div>
+          <div class="job-meta">
+            <span id="progressText">0%</span>
+          </div>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <p id="statusNote" class="status-note">Paste a URL and run the analysis.</p>
+      </div>
+    </section>
+
+    <section class="top-grid">
+      <article class="card score-card">
+        <div class="card-head">
+          <div>
+            <h2>Risk overview</h2>
+            <p>Overall verdict plus a visual breakdown across phishing, brand abuse, intelligence, and infrastructure.</p>
+          </div>
+          <div class="score-ring">
+            <svg viewBox="0 0 120 120" aria-label="Risk score ring">
+              <circle class="ring-bg" cx="60" cy="60" r="46"></circle>
+              <circle class="ring-fg" id="scoreRing" cx="60" cy="60" r="46"></circle>
+            </svg>
+            <div class="score-ring-text">
+              <span id="riskScore">—</span>
+              <small>risk</small>
+            </div>
+          </div>
+        </div>
+        <div class="score-meta">
+          <div>
+            <label>Verdict</label>
+            <strong id="verdict">—</strong>
+          </div>
+          <div>
+            <label>Brand / trademark</label>
+            <strong id="trademark">—</strong>
+          </div>
+          <div>
+            <label>Hosting hint</label>
+            <strong id="hosting">—</strong>
+          </div>
+        </div>
+      </article>
+
+      <article class="card radar-card">
+        <div class="card-head compact">
+          <div>
+            <h2>Detection profile</h2>
+            <p>Category view for analysts.</p>
+          </div>
+        </div>
+        <div class="bars" id="scoreBars"></div>
+      </article>
+    </section>
+
+    <section class="main-grid">
+      <article class="card wide-panel">
+        <div class="section-head compact">
+          <h2>Actionable insights</h2>
+          <p id="summary">Run an analysis to see a concise explanation.</p>
+        </div>
+        <div id="reasons" class="tag-list"></div>
+      </article>
+
+      <article class="card wide-panel">
+        <div class="section-head compact">
+          <h2>Analyst narrative</h2>
+          <p>What was found, why it matters, and what the customer should see first.</p>
+        </div>
+        <div id="insights" class="insight-grid"></div>
+      </article>
+
+      <article class="card panel">
+        <div class="section-head compact">
+          <h2>Threat intelligence</h2>
+          <p>Free enrichment from public sources with no API key.</p>
+        </div>
+        <div id="intelFacts" class="fact-list"></div>
+      </article>
+
+      <article class="card panel">
+        <div class="section-head compact">
+          <h2>Infrastructure</h2>
+          <p>DNS / IP / ASN / TLS context from the observed host.</p>
+        </div>
+        <div id="infraFacts" class="fact-list"></div>
+      </article>
+
+      <article class="card panel">
+        <div class="section-head compact">
+          <h2>Page access</h2>
+          <p>Challenge detection and how far the browser was able to go.</p>
+        </div>
+        <div id="accessFacts" class="fact-list"></div>
+      </article>
+
+      <article class="card panel">
+        <div class="section-head compact">
+          <h2>Domain timeline</h2>
+          <p>Creation, update, and ownership-risk clues that help identify throwaway infrastructure.</p>
+        </div>
+        <div id="timelineFacts" class="fact-list"></div>
+      </article>
+
+      <article class="card panel">
+        <div class="section-head compact">
+          <h2>Signals observed</h2>
+          <p>Parsed page features and phishing cues.</p>
+        </div>
+        <div id="signalFacts" class="fact-list"></div>
+      </article>
+
+      <article class="card panel">
+        <div class="section-head compact">
+          <h2>Evidence snapshot</h2>
+          <p>Forms, redirects, and screenshot evidence.</p>
+        </div>
+        <div id="evidenceFacts" class="fact-list"></div>
+      </article>
+    </section>
+
+    <section class="card screenshot-card">
+      <div class="section-head compact">
+        <h2>Screenshot evidence</h2>
+        <p>Rendered from the live page capture or a generated fallback image.</p>
+      </div>
+      <div class="shot-wrap">
+        <img id="screenshot" alt="Screenshot evidence" />
+        <div id="shotPlaceholder" class="shot-placeholder">
+          <span>Awaiting analysis</span>
+          <p>Paste a URL above and run the check.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card footer-card">
+      <div class="section-head compact">
+        <h2>Extensibility</h2>
+        <p id="extensibility">The detectors are modular, so you can add 50 brands, new feeds, and smarter scoring later without changing this landing page.</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
